@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seminário Inter-Religioso – Inscrição</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <img src="imgs/imgTopo.jpeg" alt="Seminário Inter-Religioso" class="banner" />
+  <div class="container">
+    <header>
+      <h1>Seminário Inter-Religioso</h1>
+      <p class="subtitle">Formulário de Inscrição</p>
+      <p class="desc">Preencha os dados abaixo para confirmar sua participação no Seminário Inter-Religioso. Todos os campos marcados com <span class="req">*</span> são obrigatórios.</p>
+    </header>
+
+    <form id="formSeminario" novalidate>
+
+      <div class="field">
+        <label for="nomeCompleto">1. Nome completo <span class="req">*</span></label>
+        <input type="text" id="nomeCompleto" name="nomeCompleto" placeholder="Seu nome completo" required autocomplete="name" />
+        <span class="error" id="err-nomeCompleto"></span>
+      </div>
+
+      <div class="field">
+        <label for="email">2. E-mail <span class="req">*</span></label>
+        <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" required autocomplete="email" />
+        <span class="error" id="err-email"></span>
+      </div>
+
+      <div class="field">
+        <label for="telefone">3. Telefone / WhatsApp <span class="req">*</span></label>
+        <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" required autocomplete="tel" maxlength="15" />
+        <span class="error" id="err-telefone"></span>
+      </div>
+
+      <div class="field">
+        <label for="religiao">4. Religião / Tradição espiritual <span class="req">*</span></label>
+        <input type="text" id="religiao" name="religiao" placeholder="Ex: Católica, Evangélica, Espírita, Umbanda, Judaísmo..." required />
+        <span class="error" id="err-religiao"></span>
+      </div>
+
+      <div class="field">
+        <label for="expectativas">5. Expectativas para o seminário</label>
+        <small>Compartilhe o que espera aprender ou vivenciar neste encontro inter-religioso.</small>
+        <textarea id="expectativas" name="expectativas" rows="4" placeholder="Descreva suas expectativas (opcional)"></textarea>
+      </div>
+
+      <div class="field">
+        <label>6. Você pretende hospedar-se acampado no Campo Escola dos Escoteiros do DF? <span class="req">*</span></label>
+        <div class="radio-options">
+          <label class="radio-label"><input type="radio" name="acampado" value="Sim" required /> Sim</label>
+          <label class="radio-label"><input type="radio" name="acampado" value="Não" /> Não</label>
+        </div>
+        <span class="error" id="err-acampado"></span>
+      </div>
+
+      <div class="field" id="field-chegada" style="display:none">
+        <label for="chegada">7. Previsão de chegada no local</label>
+        <small>A partir do dia 15/05/2026. Atenção: Leve a sua barraca e material individual para pernoite.</small>
+        <textarea id="chegada" name="chegada" rows="3" placeholder="Informe sua previsão de chegada"></textarea>
+      </div>
+
+      <div class="field">
+        <label>8. Opção de refeição <span class="req">*</span></label>
+        <small>Referente ao almoço de sábado e jantar de sábado, dia 16/05/2026, realizados em restaurante ao lado do Campo Escola dos Escoteiros do DF. Selecione o prato executivo de sua preferência.</small>
+        <p class="meal-subtitle">Para o almoço de sábado, dia 16/05/2026:</p>
+        <div class="meal-options">
+          <label class="meal-card">
+            <input type="radio" name="refeicao" value="Parmegiana de Frango" required />
+            <img src="imgs/ParmegianaDeFrango.jpeg" alt="Parmegiana de Frango" />
+            <span>Parmegiana de Frango</span>
+          </label>
+          <label class="meal-card">
+            <input type="radio" name="refeicao" value="Picadinho de Filé" />
+            <img src="imgs/picadinhoDeFile.jpeg" alt="Picadinho de Filé" />
+            <span>Picadinho de Filé</span>
+          </label>
+          <label class="meal-card">
+            <input type="radio" name="refeicao" value="Stroggonoff de Frango" />
+            <img src="imgs/StroggonofdeFrango.jpeg" alt="Stroggonoff de Frango" />
+            <span>Stroggonoff de Frango</span>
+          </label>
+          <label class="meal-card">
+            <input type="radio" name="refeicao" value="Stroggonoff de Filé" />
+            <img src="imgs/StrogonnofDeFile.jpeg" alt="Stroggonoff de Filé" />
+            <span>Stroggonoff de Filé</span>
+          </label>
+        </div>
+        <label class="radio-label veg-option">
+          <input type="radio" name="refeicao" value="Vegetariano/Vegano" />
+          Sou vegetariano ou vegano. Necessito de refeição especial.
+        </label>
+        <span class="error" id="err-refeicao"></span>
+      </div>
+
+      <div class="field">
+        <label>9. Para o jantar de sábado, dia 16/05/2026:</label>
+        <div class="meal-options">
+          <label class="meal-card">
+            <input type="radio" name="refeicaoJantar" value="Parmegiana de Frango" />
+            <img src="imgs/ParmegianaDeFrango.jpeg" alt="Parmegiana de Frango" />
+            <span>Parmegiana de Frango</span>
+          </label>
+          <label class="meal-card">
+            <input type="radio" name="refeicaoJantar" value="Picadinho de Filé" />
+            <img src="imgs/picadinhoDeFile.jpeg" alt="Picadinho de Filé" />
+            <span>Picadinho de Filé</span>
+          </label>
+          <label class="meal-card">
+            <input type="radio" name="refeicaoJantar" value="Stroggonoff de Frango" />
+            <img src="imgs/StroggonofdeFrango.jpeg" alt="Stroggonoff de Frango" />
+            <span>Stroggonoff de Frango</span>
+          </label>
+          <label class="meal-card">
+            <input type="radio" name="refeicaoJantar" value="Stroggonoff de Filé" />
+            <img src="imgs/StrogonnofDeFile.jpeg" alt="Stroggonoff de Filé" />
+            <span>Stroggonoff de Filé</span>
+          </label>
+        </div>
+        <label class="radio-label veg-option">
+          <input type="radio" name="refeicaoJantar" value="Vegetariano/Vegano" />
+          Sou vegetariano ou vegano. Necessito de refeição especial.
+        </label>
+        <span class="error" id="err-refeicaoJantar"></span>
+      </div>
+
+      <button type="submit" class="btn-submit">Confirmar Inscrição</button>
+    </form>
+
+    <div id="successMsg" class="success-msg hidden">
+      <span>✅</span>
+      <p>Inscrição realizada com sucesso! Entraremos em contato pelo telefone ou e-mail informado.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>Seminário Inter-Religioso &copy; <span id="year"></span></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

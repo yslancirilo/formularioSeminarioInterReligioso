@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Admin – Seminário Inter-Religioso</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="admin-body">
+
+  <!-- LOGIN -->
+  <div id="loginSection" class="container login-container">
+    <header>
+      <h1>Painel Administrativo</h1>
+      <p class="subtitle">Seminário Inter-Religioso</p>
+    </header>
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="adminUser">Usuário</label>
+        <input type="text" id="adminUser" placeholder="Usuário" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="adminPass">Senha</label>
+        <input type="password" id="adminPass" placeholder="Senha" autocomplete="current-password" required />
+      </div>
+      <span class="error" id="loginError"></span>
+      <button type="submit" class="btn-submit">Entrar</button>
+    </form>
+  </div>
+
+  <!-- PAINEL -->
+  <div id="adminSection" class="hidden">
+    <div class="admin-topbar">
+      <div class="admin-topbar-left">
+        <span>Painel Admin – Seminário Inter-Religioso</span>
+      </div>
+      <button id="btnLogout" class="btn-logout">Sair</button>
+    </div>
+
+    <div class="admin-content">
+      <div class="admin-header-row">
+        <h2>Inscrições Recebidas</h2>
+        <div class="admin-actions">
+          <input type="text" id="searchInput" placeholder="🔍 Buscar por nome..." class="search-input" />
+          <button id="btnExport" class="btn-export">⬇ Exportar CSV</button>
+          <button id="btnClearAll" class="btn-danger">🗑 Limpar Tudo</button>
+        </div>
+      </div>
+
+      <p id="totalCount" class="total-count"></p>
+
+      <div class="table-wrapper">
+        <table id="inscricoesTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data</th>
+              <th>Nome Completo</th>
+              <th>E-mail</th>
+              <th>Telefone</th>
+              <th>Religião</th>
+              <th>Expectativas</th>
+              <th>Acampado?</th>
+              <th>Previsão Chegada</th>
+              <th>Refeição Almoço</th>
+              <th>Refeição Jantar</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <p id="emptyMsg" class="empty-msg hidden">Nenhuma inscrição encontrada.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
