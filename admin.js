@@ -1,6 +1,4 @@
-
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCB9WLqRrbMOwIp_naOA1YTZHHu9YCzq8IRPCcpk1OmGFrqr8zPQSvKAeV2b-0CdOO/exec';
-const SESSION_KEY     = 'inter_religioso_session';
 
 function fetchJsonp(params) {
   return new Promise((resolve, reject) => {
@@ -23,183 +21,95 @@ function fetchJsonp(params) {
   });
 }
 
-function getSessionToken() { return sessionStorage.getItem(SESSION_KEY); }
-function isLoggedIn()      { return !!getSessionToken(); }
+document.getElementById('year').textContent = new Date().getFullYear();
 
-function showPanel() {
-  document.getElementById('loginSection').classList.add('hidden');
-  document.getElementById('adminSection').classList.remove('hidden');
-  loadInscricoes();
+const form       = document.getElementById('formSeminario');
+const successMsg = document.getElementById('successMsg');
+const btnSubmit  = form.querySelector('button[type="submit"]');
+
+
+function sanitize(str) {
+  return String(str).replace(/[<>"'`]/g, '').trim().slice(0, 500);
 }
 
-function showLogin() {
-  document.getElementById('loginSection').classList.remove('hidden');
-  document.getElementById('adminSection').classList.add('hidden');
+function setError(id, msg) {
+  const el    = document.getElementById('err-' + id);
+  const input = document.getElementById(id);
+  if (el)    el.textContent = msg;
+  if (input) input.classList.toggle('invalid', !!msg);
 }
 
-if (isLoggedIn()) showPanel();
-
-document.getElementById('loginForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
-  const user  = document.getElementById('adminUser').value.trim();
-  const pass  = document.getElementById('adminPass').value;
-  const errEl = document.getElementById('loginError');
-
-  errEl.textContent = 'Verificando...';
-
-  try {
-    const json = await fetchJsonp({ action: 'login', user, pass });
-    if (json.status === 'ok' && json.token) {
-      sessionStorage.setItem(SESSION_KEY, json.token);
-      errEl.textContent = '';
-      showPanel();
-    } else {
-      errEl.textContent = 'Usuário ou senha incorretos.';
-      document.getElementById('adminPass').value = '';
-    }
-  } catch {
-    errEl.textContent = 'Erro ao conectar. Tente novamente.';
-  }
-});
-
-document.getElementById('btnLogout').addEventListener('click', function () {
-  sessionStorage.removeItem(SESSION_KEY);
-  showLogin();
-});
-
-let allData = [];
-
-async function loadInscricoes() {
-  const tbody    = document.getElementById('tableBody');
-  const emptyMsg = document.getElementById('emptyMsg');
-
-  tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:#999">Carregando...</td></tr>';
-  emptyMsg.classList.add('hidden');
-
-  try {
-    const json = await fetchJsonp({ action: 'getData', token: getSessionToken() });
-
-    if (json.status === 'unauthorized') {
-      sessionStorage.removeItem(SESSION_KEY);
-      showLogin();
-      return;
-    }
-
-    if (json.status !== 'ok') throw new Error('Erro no servidor.');
-
-    allData = json.data || [];
-    console.log('DEBUG dados recebidos:', JSON.stringify(json));
-    console.log('DEBUG primeira linha:', allData[0]);
-    renderTable(document.getElementById('searchInput').value.toLowerCase().trim());
-
-  } catch (err) {
-    const td = document.createElement('td');
-    td.colSpan = 11;
-    td.style.cssText = 'text-align:center;padding:24px;color:#e53935';
-    td.textContent = 'Erro ao carregar dados: ' + err.message;
-    const tr = document.createElement('tr');
-    tr.appendChild(td);
-    tbody.innerHTML = '';
-    tbody.appendChild(tr);
-  }
-}
-
-function formatDate(raw) {
-  const d = new Date(raw);
-  if (isNaN(d)) return raw;
-  return d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-}
-
-function renderTable(filter = '') {
-  const tbody      = document.getElementById('tableBody');
-  const emptyMsg   = document.getElementById('emptyMsg');
-  const totalCount = document.getElementById('totalCount');
-
-  const filtered = filter
-    ? allData.filter(r =>
-        String(r['Nome Completo']).toLowerCase().includes(filter) ||
-        String(r['Registro UEB']).toLowerCase().includes(filter) ||
-        String(r['Região Escoteira']).toLowerCase().includes(filter) ||
-        String(r['Religião / Tradição Espiritual']).toLowerCase().includes(filter)
-      )
-    : allData;
-
-  totalCount.textContent = `Total: ${allData.length} inscrição(ões)${filter ? ` — ${filtered.length} encontrada(s)` : ''}`;
-
-  tbody.innerHTML = '';
-
-  if (filtered.length === 0) {
-    emptyMsg.classList.remove('hidden');
-    return;
-  }
-  emptyMsg.classList.add('hidden');
-
-  filtered.forEach((r, i) => {
-    const tr = document.createElement('tr');
-    const cells = [
-      i + 1,
-      formatDate(r['Data de Envio']),
-      r['Nome Completo'],
-      r['Registro UEB'],
-      r['Região Escoteira'],
-      r['Religião / Tradição Espiritual'],
-      r['Expectativas para o Seminário'],
-      r['Hospedagem Acampado?'],
-      r['Previsão de Chegada'],
-      r['Refeição - Almoço (16/05/2026)'],
-      r['Refeição - Jantar (16/05/2026)'],
-    ];
-
-    cells.forEach((val, ci) => {
-      const td = document.createElement('td');
-      if (ci === 0) {
-        const span = document.createElement('span');
-        span.className = 'badge-num';
-        span.textContent = val;
-        td.appendChild(span);
-      } else {
-        td.textContent = val ?? '';
-      }
-      tr.appendChild(td);
-    });
-
-      tbody.appendChild(tr);
+// Mostrar/ocultar campo de chegada conforme resposta de acampamento
+document.querySelectorAll('input[name="acampado"]').forEach(el => {
+  el.addEventListener('change', function () {
+    document.getElementById('field-chegada').style.display = this.value === 'Sim' ? '' : 'none';
   });
+});
+
+function clearErrors() {
+  ['nomeCompleto', 'registroUEB', 'regiaoEscoteira', 'religiao', 'acampado', 'refeicao', 'refeicaoJantar']
+    .forEach(id => setError(id, ''));
 }
 
-document.getElementById('searchInput').addEventListener('input', function () {
-  renderTable(this.value.toLowerCase().trim());
+function validate(data) {
+  let ok = true;
+  if (!data.nomeCompleto || data.nomeCompleto.length < 5) {
+    setError('nomeCompleto', 'Informe seu nome completo.'); ok = false;
+  }
+  if (!data.registroUEB || data.registroUEB.length < 2) {
+    setError('registroUEB', 'Informe seu registro UEB.'); ok = false;
+  }
+  if (!data.regiaoEscoteira || data.regiaoEscoteira.length < 2) {
+    setError('regiaoEscoteira', 'Informe sua região escoteira.'); ok = false;
+  }
+  if (!data.religiao || data.religiao.length < 2) {
+    setError('religiao', 'Informe sua religião ou tradição espiritual.'); ok = false;
+  }
+  if (!data.acampado) {
+    setError('acampado', 'Selecione uma opção.'); ok = false;
+  }
+  if (!data.refeicao) {
+    setError('refeicao', 'Selecione uma opção de refeição para o almoço.'); ok = false;
+  }
+  if (!data.refeicaoJantar) {
+    setError('refeicaoJantar', 'Selecione uma opção de refeição para o jantar.'); ok = false;
+  }
+  return ok;
+}
+
+form.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  clearErrors();
+
+  const acampadoEl      = form.querySelector('input[name="acampado"]:checked');
+  const refeicaoEl      = form.querySelector('input[name="refeicao"]:checked');
+  const refeicaoJantarEl = form.querySelector('input[name="refeicaoJantar"]:checked');
+
+  const data = {
+    nomeCompleto:    sanitize(document.getElementById('nomeCompleto').value),
+    registroUEB:     sanitize(document.getElementById('registroUEB').value),
+    regiaoEscoteira: sanitize(document.getElementById('regiaoEscoteira').value),
+    religiao:        sanitize(document.getElementById('religiao').value),
+    expectativas:    sanitize(document.getElementById('expectativas').value),
+    acampado:        acampadoEl ? acampadoEl.value : '',
+    chegada:         sanitize(document.getElementById('chegada').value),
+    refeicao:        refeicaoEl ? refeicaoEl.value : '',
+    refeicaoJantar:  refeicaoJantarEl ? refeicaoJantarEl.value : '',
+  };
+
+  if (!validate(data)) return;
+
+  btnSubmit.disabled    = true;
+  btnSubmit.textContent = 'Enviando...';
+
+  try {
+    fetchJsonp({ action: 'submit', ...data });
+    setTimeout(() => {
+      form.classList.add('hidden');
+      successMsg.classList.remove('hidden');
+    }, 1500);
+  } finally {
+    btnSubmit.disabled    = false;
+    btnSubmit.textContent = 'Confirmar Inscrição';
+  }
 });
-
-document.getElementById('btnExport').addEventListener('click', function () {
-  if (!allData.length) { document.getElementById('emptyMsg').classList.remove('hidden'); return; }
-
-  const headers = ['#', 'Data', 'Nome Completo', 'Registro UEB', 'Região Escoteira', 'Religião', 'Expectativas', 'Acampado?', 'Previsão Chegada', 'Refeição Almoço', 'Refeição Jantar'];
-  const rows = allData.map((r, i) => [
-    i + 1,
-    r['Data de Envio'],
-    r['Nome Completo'],
-    r['Registro UEB'],
-    r['Região Escoteira'],
-    r['Religião / Tradição Espiritual'],
-    r['Expectativas para o Seminário'],
-    r['Hospedagem Acampado?'],
-    r['Previsão de Chegada'],
-    r['Refeição - Almoço (16/05/2026)'],
-    r['Refeição - Jantar (16/05/2026)'],
-  ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'));
-
-  const csv  = '\uFEFF' + [headers.join(';'), ...rows].join('\r\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `inscricoes-seminario-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-document.getElementById('btnClearAll').textContent = '🔄 Atualizar';
-document.getElementById('btnClearAll').classList.remove('btn-danger');
-document.getElementById('btnClearAll').classList.add('btn-export');
-document.getElementById('btnClearAll').addEventListener('click', loadInscricoes);
