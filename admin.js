@@ -1,4 +1,4 @@
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCB9WLqRrbMOwIp_naOA1YTZHHu9YCzq8IRPCcpk1OmGFrqr8zPQSvKAeV2b-0CdOO/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/library/d/11MjcDN0iAQ0TN2eJj3ftgcGprpAYAyvsqXkRk6k2WT75V-E7FDpOOhuv/1';
 const SESSION_KEY     = 'inter_religioso_session';
 
 function fetchJsonp(params) {
