@@ -116,7 +116,8 @@ function renderTable(filter = '') {
   const filtered = filter
     ? allData.filter(r =>
         String(r['Nome Completo']).toLowerCase().includes(filter) ||
-        String(r['E-mail']).toLowerCase().includes(filter) ||
+        String(r['Registro UEB']).toLowerCase().includes(filter) ||
+        String(r['Região Escoteira']).toLowerCase().includes(filter) ||
         String(r['Religião / Tradição Espiritual']).toLowerCase().includes(filter)
       )
     : allData;
@@ -137,8 +138,8 @@ function renderTable(filter = '') {
       i + 1,
       formatDate(r['Data de Envio']),
       r['Nome Completo'],
-      r['E-mail'],
-      r['Telefone / WhatsApp'],
+      r['Registro UEB'],
+      r['Região Escoteira'],
       r['Religião / Tradição Espiritual'],
       r['Expectativas para o Seminário'],
       r['Hospedagem Acampado?'],
@@ -160,20 +161,7 @@ function renderTable(filter = '') {
       tr.appendChild(td);
     });
 
-    const tdWa = document.createElement('td');
-    const phone = String(r['Telefone / WhatsApp'] || '').replace(/\D/g, '');
-    if (/^\d{10,11}$/.test(phone)) {
-      const a = document.createElement('a');
-      a.href = `https://wa.me/55${phone}`;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.className = 'btn-whatsapp';
-      a.title = 'Abrir WhatsApp';
-      a.textContent = '💬';
-      tdWa.appendChild(a);
-    }
-    tr.appendChild(tdWa);
-    tbody.appendChild(tr);
+      tbody.appendChild(tr);
   });
 }
 
@@ -184,13 +172,13 @@ document.getElementById('searchInput').addEventListener('input', function () {
 document.getElementById('btnExport').addEventListener('click', function () {
   if (!allData.length) { document.getElementById('emptyMsg').classList.remove('hidden'); return; }
 
-  const headers = ['#', 'Data', 'Nome Completo', 'E-mail', 'Telefone', 'Religião', 'Expectativas', 'Acampado?', 'Previsão Chegada', 'Refeição Almoço', 'Refeição Jantar'];
+  const headers = ['#', 'Data', 'Nome Completo', 'Registro UEB', 'Região Escoteira', 'Religião', 'Expectativas', 'Acampado?', 'Previsão Chegada', 'Refeição Almoço', 'Refeição Jantar'];
   const rows = allData.map((r, i) => [
     i + 1,
     r['Data de Envio'],
     r['Nome Completo'],
-    r['E-mail'],
-    r['Telefone / WhatsApp'],
+    r['Registro UEB'],
+    r['Região Escoteira'],
     r['Religião / Tradição Espiritual'],
     r['Expectativas para o Seminário'],
     r['Hospedagem Acampado?'],
