@@ -1,5 +1,4 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSp38jILtdafrbsbRFFIyHqQvl9CqH2CTEIY8vFCc1_duag80KK7QXzB1kHpD76MKw/exec';
-
 const SESSION_KEY = 'inter_religioso_session';
 
 function fetchJsonp(params) {
@@ -228,18 +227,6 @@ document.getElementById('btnExport').addEventListener('click', function () {
   URL.revokeObjectURL(url);
 });
 
-document.getElementById('btnClearAll').addEventListener('click', function () {
-  if (confirm('Tem certeza que deseja limpar todas as inscrições? Esta ação não pode ser desfeita.')) {
-    fetchJsonp({ action: 'clearAll', token: getSessionToken() })
-      .then(result => {
-        if (result && result.status === 'ok') {
-          allData = [];
-          renderTable('');
-          alert('Todas as inscrições foram removidas.');
-        } else {
-          alert('Erro ao limpar inscrições: ' + (result?.message || 'Erro desconhecido'));
-        }
-      })
-      .catch(err => alert('Erro ao conectar: ' + err.message));
-  }
+document.getElementById('btnRefresh').addEventListener('click', function () {
+  loadInscricoes();
 });
