@@ -7,6 +7,211 @@ function fetchJsonp(params) {
     const cbName = '_cb_' + Date.now();
     const base   = Object.entries(params).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
     const url    = `${APPS_SCRIPT_URL}?${base}&callback=${cbName}`;
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCB9WLqRrbMOwIp_naOA1YTZHHu9YCzq8IRPCcpk1OmGFrqr8zPQSvKAeV2b-0CdOO/exec';
+const SESSION_KEY     = 'inter_religioso_session';
+
+function fetchJsonp(params) {
+  return new Promise((resolve, reject) => {
+    const cbName = '_cb_' + Date.now();
+    const base   = Object.entries(params).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+    const url    = `${APPS_SCRIPT_URL}?${base}&callback=${cbName}`;
+    const script = document.createElement('script');
+    const timer  = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 10000);
+
+    window[cbName] = (data) => { cleanup(); resolve(data); };
+    script.onerror = () => { cleanup(); reject(new Error('Erro de rede')); };
+    script.src = url;
+    document.head.appendChild(script);
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      script.remove();
+    }
+  });
+}
+
+function getSessionToken() { return sessionStorage.getItem(SESSION_KEY); }
+function isLoggedIn()      { return !!getSessionToken(); }
+
+function showPanel() {
+  document.getElementById('loginSection').classList.add('hidden');
+  document.getElementById('adminSection').classList.remove('hidden');
+  loadInscricoes();
+}
+
+function showLogin() {
+  document.getElementById('loginSection').classList.remove('hidden');
+  document.getElementById('adminSection').classList.add('hidden');
+}
+
+if (isLoggedIn()) showPanel();
+
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const user  = document.getElementById('adminUser').value.trim();
+  const pass  = document.getElementById('adminPass').value;
+  const errEl = document.getElementById('loginError');
+
+  errEl.textContent = 'Verificando...';
+
+  try {
+    const json = await fetchJsonp({ action: 'login', user, pass });
+    if (json.status === 'ok' && json.token) {
+      sessionStorage.setItem(SESSION_KEY, json.token);
+      errEl.textContent = '';
+      showPanel();
+    } else {
+      errEl.textContent = 'Usuário ou senha incorretos.';
+      document.getElementById('adminPass').value = '';
+    }
+  } catch {
+    errEl.textContent = 'Erro ao conectar. Tente novamente.';
+  }
+});
+
+document.getElementById('btnLogout').addEventListener('click', function () {
+  sessionStorage.removeItem(SESSION_KEY);
+  showLogin();
+});
+
+let allData = [];
+
+async function loadInscricoes() {
+  const tbody    = document.getElementById('tableBody');
+  const emptyMsg = document.getElementById('emptyMsg');
+
+  tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:#999">Carregando...</td></tr>';
+  emptyMsg.classList.add('hidden');
+
+  try {
+    const json = await fetchJsonp({ action: 'getData', token: getSessionToken() });
+
+    if (json.status === 'unauthorized') {
+      sessionStorage.removeItem(SESSION_KEY);
+      showLogin();
+      return;
+    }
+
+    if (json.status !== 'ok') throw new Error('Erro no servidor.');
+
+    allData = json.data || [];
+    console.log('DEBUG dados recebidos:', JSON.stringify(json));
+    console.log('DEBUG primeira linha:', allData[0]);
+    renderTable(document.getElementById('searchInput').value.toLowerCase().trim());
+
+  } catch (err) {
+    const td = document.createElement('td');
+    td.colSpan = 11;
+    td.style.cssText = 'text-align:center;padding:24px;color:#e53935';
+    td.textContent = 'Erro ao carregar dados: ' + err.message;
+    const tr = document.createElement('tr');
+    tr.appendChild(td);
+    tbody.innerHTML = '';
+    tbody.appendChild(tr);
+  }
+}
+
+function formatDate(raw) {
+  const d = new Date(raw);
+  if (isNaN(d)) return raw;
+  return d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+}
+
+function renderTable(filter = '') {
+  const tbody      = document.getElementById('tableBody');
+  const emptyMsg   = document.getElementById('emptyMsg');
+  const totalCount = document.getElementById('totalCount');
+
+  const filtered = filter
+    ? allData.filter(r =>
+        String(r['Nome Completo']).toLowerCase().includes(filter) ||
+        String(r['Registro UEB'] || r['E-mail']).toLowerCase().includes(filter) ||
+        String(r['Região Escoteira'] || r['Telefone / WhatsApp']).toLowerCase().includes(filter) ||
+        String(r['Religião / Tradição Espiritual']).toLowerCase().includes(filter)
+      )
+    : allData;
+
+  totalCount.textContent = `Total: ${allData.length} inscrição(ões)${filter ? ` — ${filtered.length} encontrada(s)` : ''}`;
+
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    emptyMsg.classList.remove('hidden');
+    return;
+  }
+  emptyMsg.classList.add('hidden');
+
+  filtered.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    const cells = [
+      i + 1,
+      formatDate(r['Data de Envio']),
+      r['Nome Completo'],
+      r['Registro UEB'] || r['E-mail'],
+      r['Região Escoteira'] || r['Telefone / WhatsApp'],
+      r['Religião / Tradição Espiritual'],
+      r['Expectativas para o Seminário'],
+      r['Hospedagem Acampado?'],
+      r['Previsão de Chegada'],
+      r['Refeição - Almoço (16/05/2026)'],
+      r['Refeição - Jantar (16/05/2026)'],
+    ];
+
+    cells.forEach((val, ci) => {
+      const td = document.createElement('td');
+      if (ci === 0) {
+        const span = document.createElement('span');
+        span.className = 'badge-num';
+        span.textContent = val;
+        td.appendChild(span);
+      } else {
+        td.textContent = val ?? '';
+      }
+      tr.appendChild(td);
+    });
+
+      tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', function () {
+  renderTable(this.value.toLowerCase().trim());
+});
+
+document.getElementById('btnExport').addEventListener('click', function () {
+  if (!allData.length) { document.getElementById('emptyMsg').classList.remove('hidden'); return; }
+
+  const headers = ['#', 'Data', 'Nome Completo', 'Registro UEB', 'Região Escoteira', 'Religião', 'Expectativas', 'Acampado?', 'Previsão Chegada', 'Refeição Almoço', 'Refeição Jantar'];
+  const rows = allData.map((r, i) => [
+    i + 1,
+    r['Data de Envio'],
+    r['Nome Completo'],
+    r['Registro UEB'] || r['E-mail'],
+    r['Região Escoteira'] || r['Telefone / WhatsApp'],
+    r['Religião / Tradição Espiritual'],
+    r['Expectativas para o Seminário'],
+    r['Hospedagem Acampado?'],
+    r['Previsão de Chegada'],
+    r['Refeição - Almoço (16/05/2026)'],
+    r['Refeição - Jantar (16/05/2026)'],
+  ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'));
+
+  const csv  = '\uFEFF' + [headers.join(';'), ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `inscricoes-seminario-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('btnClearAll').textContent = '🔄 Atualizar';
+document.getElementById('btnClearAll').classList.remove('btn-danger');
+document.getElementById('btnClearAll').classList.add('btn-export');
+document.getElementById('btnClearAll').addEventListener('click', loadInscricoes);
+
     const script = document.createElement('script');
     const timer  = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 10000);
 
