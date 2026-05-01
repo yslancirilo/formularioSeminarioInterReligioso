@@ -103,7 +103,7 @@ form.addEventListener('submit', async function (e) {
   btnSubmit.textContent = 'Enviando...';
 
   try {
-    fetchJsonp({ action: 'submit', ...data });
+    await fetchJsonp({ action: 'submit', ...data });
     setTimeout(() => {
       form.classList.add('hidden');
       successMsg.classList.remove('hidden');
