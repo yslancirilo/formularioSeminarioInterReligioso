@@ -1,4 +1,4 @@
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx809Tl29PrP9eISeMZyuTb_pvHYT1vCp95e81IyCTJroMVrU94vwfsCK8qqgAM27JlMg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSp38jILtdafrbsbRFFIyHqQvl9CqH2CTEIY8vFCc1_duag80KK7QXzB1kHpD76MKw/exec';
 
 function fetchJsonp(params) {
   return new Promise((resolve, reject) => {
