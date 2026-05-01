@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1º Seminário Nacional de Diálogo Inter-religioso - Escoteiros do Brasil</title>
+  <title>Seminário Inter-Religioso – Inscrição</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <img src="imgs/imgTopo.jpeg" alt="Seminário Inter-Religioso" class="banner" />
   <div class="container">
     <header>
-      <h1>1º Seminário Nacional de Diálogo Inter-religioso - Escoteiros do Brasil</h1>
-      <p class="subtitle"></p>
-      <p class="desc">Preencha os dados abaixo para identificação dos seus horários de chegada, opções de refeições e dados gerais em nosso Seminário. Todos os campos marcados com <span class="req">*</span> são obrigatórios.</p>
+      <h1>Seminário Inter-Religioso</h1>
+      <p class="subtitle">Formulário de Inscrição</p>
+      <p class="desc">Preencha os dados abaixo para confirmar sua participação no Seminário Inter-Religioso. Todos os campos marcados com <span class="req">*</span> são obrigatórios.</p>
     </header>
 
     <form id="formSeminario" novalidate>
@@ -24,19 +24,19 @@
       </div>
 
       <div class="field">
-        <label for="email">2. E-mail <span class="req">*</span></label>
-        <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" required autocomplete="email" />
-        <span class="error" id="err-email"></span>
+        <label for="registroUEB">2. Registro UEB <span class="req">*</span></label>
+        <input type="text" id="registroUEB" name="registroUEB" placeholder="Seu registro UEB" required />
+        <span class="error" id="err-registroUEB"></span>
       </div>
 
       <div class="field">
-        <label for="telefone">3. Telefone / WhatsApp <span class="req">*</span></label>
-        <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" required autocomplete="tel" maxlength="15" />
-        <span class="error" id="err-telefone"></span>
+        <label for="regiaoEscoteira">3. Região Escoteira <span class="req">*</span></label>
+        <input type="text" id="regiaoEscoteira" name="regiaoEscoteira" placeholder="Sua região escoteira" required />
+        <span class="error" id="err-regiaoEscoteira"></span>
       </div>
 
       <div class="field">
-        <label for="religiao">4. Religião / Crença <span class="req">*</span></label>
+        <label for="religiao">4. Religião / Tradição espiritual <span class="req">*</span></label>
         <input type="text" id="religiao" name="religiao" placeholder="Ex: Católica, Evangélica, Espírita, Umbanda, Judaísmo..." required />
         <span class="error" id="err-religiao"></span>
       </div>
@@ -126,7 +126,7 @@
         <span class="error" id="err-refeicaoJantar"></span>
       </div>
 
-      <button type="submit" class="btn-submit">Confirmar informações</button>
+      <button type="submit" class="btn-submit">Confirmar Inscrição</button>
     </form>
 
     <div id="successMsg" class="success-msg hidden">
