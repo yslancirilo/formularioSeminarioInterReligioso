@@ -27,13 +27,6 @@ const form       = document.getElementById('formSeminario');
 const successMsg = document.getElementById('successMsg');
 const btnSubmit  = form.querySelector('button[type="submit"]');
 
-document.getElementById('telefone').addEventListener('input', function () {
-  let v = this.value.replace(/\D/g, '').slice(0, 11);
-  if (v.length > 10)     v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
-  else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d*)$/,   '($1) $2-$3');
-  else if (v.length > 2) v = v.replace(/^(\d{2})(\d*)$/,           '($1) $2');
-  this.value = v;
-});
 
 function sanitize(str) {
   return String(str).replace(/[<>"'`]/g, '').trim().slice(0, 500);
@@ -54,7 +47,7 @@ document.querySelectorAll('input[name="acampado"]').forEach(el => {
 });
 
 function clearErrors() {
-  ['nomeCompleto', 'email', 'telefone', 'religiao', 'acampado', 'refeicao', 'refeicaoJantar']
+  ['nomeCompleto', 'registroUEB', 'regiaoEscoteira', 'religiao', 'acampado', 'refeicao', 'refeicaoJantar']
     .forEach(id => setError(id, ''));
 }
 
@@ -63,11 +56,11 @@ function validate(data) {
   if (!data.nomeCompleto || data.nomeCompleto.length < 5) {
     setError('nomeCompleto', 'Informe seu nome completo.'); ok = false;
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-    setError('email', 'Informe um e-mail válido.'); ok = false;
+  if (!data.registroUEB || data.registroUEB.length < 2) {
+    setError('registroUEB', 'Informe seu registro UEB.'); ok = false;
   }
-  if (data.telefone.replace(/\D/g, '').length < 10) {
-    setError('telefone', 'Informe um telefone válido com DDD.'); ok = false;
+  if (!data.regiaoEscoteira || data.regiaoEscoteira.length < 2) {
+    setError('regiaoEscoteira', 'Informe sua região escoteira.'); ok = false;
   }
   if (!data.religiao || data.religiao.length < 2) {
     setError('religiao', 'Informe sua religião ou tradição espiritual.'); ok = false;
@@ -94,8 +87,8 @@ form.addEventListener('submit', async function (e) {
 
   const data = {
     nomeCompleto:    sanitize(document.getElementById('nomeCompleto').value),
-    email:           sanitize(document.getElementById('email').value),
-    telefone:        sanitize(document.getElementById('telefone').value),
+    registroUEB:     sanitize(document.getElementById('registroUEB').value),
+    regiaoEscoteira: sanitize(document.getElementById('regiaoEscoteira').value),
     religiao:        sanitize(document.getElementById('religiao').value),
     expectativas:    sanitize(document.getElementById('expectativas').value),
     acampado:        acampadoEl ? acampadoEl.value : '',
