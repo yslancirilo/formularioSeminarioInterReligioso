@@ -1,15 +1,27 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSp38jILtdafrbsbRFFIyHqQvl9CqH2CTEIY8vFCc1_duag80KK7QXzB1kHpD76MKw/exec';
-
 function fetchJsonp(params) {
   return new Promise((resolve, reject) => {
-    const cbName = '_cb_' + Date.now();
-    const base   = Object.entries(params).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
-    const url    = `${APPS_SCRIPT_URL}?${base}&callback=${cbName}`;
+    const cbName = '_cb_' + Date.now() + Math.random().toString(36).substr(2, 9);
+    const base = Object.entries(params)
+      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+      .join('&');
+    const url = `${APPS_SCRIPT_URL}?${base}&callback=${cbName}`;
     const script = document.createElement('script');
-    const timer  = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 10000);
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error('Timeout na requisição'));
+    }, 10000);
 
-    window[cbName] = (data) => { cleanup(); resolve(data); };
-    script.onerror = () => { cleanup(); reject(new Error('Erro de rede')); };
+    window[cbName] = (data) => {
+      cleanup();
+      resolve(data);
+    };
+
+    script.onerror = () => {
+      cleanup();
+      reject(new Error('Erro de rede'));
+    };
+
     script.src = url;
     document.head.appendChild(script);
 
@@ -23,23 +35,21 @@ function fetchJsonp(params) {
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
-const form       = document.getElementById('formSeminario');
+const form = document.getElementById('formSeminario');
 const successMsg = document.getElementById('successMsg');
-const btnSubmit  = form.querySelector('button[type="submit"]');
-
+const btnSubmit = form.querySelector('button[type="submit"]');
 
 function sanitize(str) {
   return String(str).replace(/[<>"'`]/g, '').trim().slice(0, 500);
 }
 
 function setError(id, msg) {
-  const el    = document.getElementById('err-' + id);
+  const el = document.getElementById('err-' + id);
   const input = document.getElementById(id);
-  if (el)    el.textContent = msg;
+  if (el) el.textContent = msg;
   if (input) input.classList.toggle('invalid', !!msg);
 }
 
-// Mostrar/ocultar campo de chegada conforme resposta de acampamento
 document.querySelectorAll('input[name="acampado"]').forEach(el => {
   el.addEventListener('change', function () {
     document.getElementById('field-chegada').style.display = this.value === 'Sim' ? '' : 'none';
@@ -54,25 +64,32 @@ function clearErrors() {
 function validate(data) {
   let ok = true;
   if (!data.nomeCompleto || data.nomeCompleto.length < 5) {
-    setError('nomeCompleto', 'Informe seu nome completo.'); ok = false;
+    setError('nomeCompleto', 'Informe seu nome completo.');
+    ok = false;
   }
   if (!data.registroUEB || data.registroUEB.length < 2) {
-    setError('registroUEB', 'Informe seu registro UEB.'); ok = false;
+    setError('registroUEB', 'Informe seu registro UEB.');
+    ok = false;
   }
   if (!data.regiaoEscoteira || data.regiaoEscoteira.length < 2) {
-    setError('regiaoEscoteira', 'Informe sua região escoteira.'); ok = false;
+    setError('regiaoEscoteira', 'Informe sua região escoteira.');
+    ok = false;
   }
   if (!data.religiao || data.religiao.length < 2) {
-    setError('religiao', 'Informe sua religião ou tradição espiritual.'); ok = false;
+    setError('religiao', 'Informe sua religião ou tradição espiritual.');
+    ok = false;
   }
   if (!data.acampado) {
-    setError('acampado', 'Selecione uma opção.'); ok = false;
+    setError('acampado', 'Selecione uma opção.');
+    ok = false;
   }
   if (!data.refeicao) {
-    setError('refeicao', 'Selecione uma opção de refeição para o almoço.'); ok = false;
+    setError('refeicao', 'Selecione uma opção de refeição para o almoço.');
+    ok = false;
   }
   if (!data.refeicaoJantar) {
-    setError('refeicaoJantar', 'Selecione uma opção de refeição para o jantar.'); ok = false;
+    setError('refeicaoJantar', 'Selecione uma opção de refeição para o jantar.');
+    ok = false;
   }
   return ok;
 }
@@ -81,35 +98,41 @@ form.addEventListener('submit', async function (e) {
   e.preventDefault();
   clearErrors();
 
-  const acampadoEl      = form.querySelector('input[name="acampado"]:checked');
-  const refeicaoEl      = form.querySelector('input[name="refeicao"]:checked');
+  const acampadoEl = form.querySelector('input[name="acampado"]:checked');
+  const refeicaoEl = form.querySelector('input[name="refeicao"]:checked');
   const refeicaoJantarEl = form.querySelector('input[name="refeicaoJantar"]:checked');
 
   const data = {
-    nomeCompleto:    sanitize(document.getElementById('nomeCompleto').value),
-    registroUEB:     sanitize(document.getElementById('registroUEB').value),
+    action: 'submit',
+    nomeCompleto: sanitize(document.getElementById('nomeCompleto').value),
+    registroUEB: sanitize(document.getElementById('registroUEB').value),
     regiaoEscoteira: sanitize(document.getElementById('regiaoEscoteira').value),
-    religiao:        sanitize(document.getElementById('religiao').value),
-    expectativas:    sanitize(document.getElementById('expectativas').value),
-    acampado:        acampadoEl ? acampadoEl.value : '',
-    chegada:         sanitize(document.getElementById('chegada').value),
-    refeicao:        refeicaoEl ? refeicaoEl.value : '',
-    refeicaoJantar:  refeicaoJantarEl ? refeicaoJantarEl.value : '',
+    religiao: sanitize(document.getElementById('religiao').value),
+    expectativas: sanitize(document.getElementById('expectativas').value),
+    acampado: acampadoEl ? acampadoEl.value : '',
+    chegada: sanitize(document.getElementById('chegada').value),
+    refeicao: refeicaoEl ? refeicaoEl.value : '',
+    refeicaoJantar: refeicaoJantarEl ? refeicaoJantarEl.value : '',
   };
 
   if (!validate(data)) return;
 
-  btnSubmit.disabled    = true;
+  btnSubmit.disabled = true;
   btnSubmit.textContent = 'Enviando...';
 
   try {
-    await fetchJsonp({ action: 'submit', ...data });
-    setTimeout(() => {
+    const result = await fetchJsonp(data);
+    if (result && result.status === 'ok') {
       form.classList.add('hidden');
       successMsg.classList.remove('hidden');
-    }, 1500);
+    } else {
+      setError('nomeCompleto', result?.message || 'Erro ao enviar inscrição');
+    }
+  } catch (err) {
+    setError('nomeCompleto', 'Erro ao conectar: ' + err.message);
   } finally {
-    btnSubmit.disabled    = false;
+    btnSubmit.disabled = false;
     btnSubmit.textContent = 'Confirmar Inscrição';
   }
 });
+
